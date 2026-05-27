@@ -88,7 +88,11 @@ def load_user(user_id):
 
 def generate_qr_code(token):
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr.add_data(f"http://localhost:5000/download/{token}")
+    try:
+        qr_url = url_for('download_hall_ticket', token=token, _external=True)
+    except RuntimeError:
+        qr_url = f"http://localhost:5000/download/{token}"
+    qr.add_data(qr_url)
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
     filename = f"{token}.png"

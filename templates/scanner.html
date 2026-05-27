@@ -60,7 +60,11 @@
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
 function onScanSuccess(decodedText, decodedResult) {
-    window.location.href = decodedText.replace('http://localhost:5000', '');
+    if (decodedText.startsWith('http://') || decodedText.startsWith('https://')) {
+        window.location.href = decodedText;
+    } else {
+        window.location.href = '/verify/' + encodeURIComponent(decodedText);
+    }
 }
 
 function onScanFailure(error) {
