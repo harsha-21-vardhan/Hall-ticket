@@ -811,11 +811,12 @@ def init_db():
             db.session.commit()
             print("Admin account created: admin / admin123")
 
-
-# Ensure database is initialized when the application starts under WSGI (e.g. gunicorn)
-@app.before_first_request
-def ensure_db():
+# Call init_db() at import time so tables exist when the app is imported by WSGI servers
+try:
     init_db()
+except Exception:
+    # If DB cannot be initialized at import time (permissions, env), skip silently
+    pass
 
 if __name__ == '__main__':
     init_db()
