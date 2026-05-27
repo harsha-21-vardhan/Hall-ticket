@@ -811,6 +811,12 @@ def init_db():
             db.session.commit()
             print("Admin account created: admin / admin123")
 
+
+# Ensure database is initialized when the application starts under WSGI (e.g. gunicorn)
+@app.before_first_request
+def ensure_db():
+    init_db()
+
 if __name__ == '__main__':
     init_db()
     port = int(os.environ.get('PORT', 5000))
