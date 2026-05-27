@@ -62,7 +62,10 @@ class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     subject_name = db.Column(db.String(100), nullable=False)
     subject_code = db.Column(db.String(20), unique=True, nullable=False)
-    exams = db.relationship('Exam', backref='subject', lazy=True)
+    exams = db.relationship(
+        'Exam', backref='subject', lazy=True,
+        cascade='all, delete-orphan'
+    )
 
 class Exam(db.Model):
     __tablename__ = 'exams'
@@ -459,9 +462,13 @@ def delete_subject(id):
         return redirect(url_for('home'))
     
     subject = Subject.query.get_or_404(id)
-    db.session.delete(subject)
-    db.session.commit()
-    flash('Subject deleted successfully', 'success')
+    try:
+        db.session.delete(subject)
+        db.session.commit()
+        flash('Subject deleted successfully', 'success')
+    except Exception:
+        db.session.rollback()
+        flash('Unable to delete subject. Remove related exams first or try again.', 'danger')
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/add-exam', methods=['POST'])
