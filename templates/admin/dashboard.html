@@ -1,0 +1,592 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Smart Hall Ticket System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stat-card {
+        border-radius: 10px;
+        transition: transform 0.3s;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    .chat-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 320px;
+        z-index: 1000;
+    }
+    .chat-btn-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+    .chat-tooltip {
+        position: absolute;
+        bottom: 70px;
+        right: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .chat-tooltip::after {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        right: 20px;
+        border-width: 6px 6px 0;
+        border-style: solid;
+        border-color: #764ba2 transparent;
+    }
+    .chat-btn-wrapper:hover .chat-tooltip {
+        opacity: 1;
+        visibility: visible;
+        bottom: 75px;
+    }
+    .chat-toggle-btn {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: 3px solid white;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3), 0 0 20px rgba(102, 126, 234, 0.5);
+        transition: all 0.3s ease;
+        animation: pulse 2s infinite, float 3s ease-in-out infinite;
+    }
+    .chat-toggle-btn:hover {
+        transform: scale(1.15);
+        box-shadow: 0 6px 25px rgba(0,0,0,0.4), 0 0 30px rgba(102, 126, 234, 0.8);
+        animation: none;
+    }
+    @keyframes pulse {
+        0% { box-shadow: 0 4px 15px rgba(0,0,0,0.3), 0 0 20px rgba(102, 126, 234, 0.5); }
+        50% { box-shadow: 0 4px 15px rgba(0,0,0,0.3), 0 0 35px rgba(102, 126, 234, 0.9); }
+        100% { box-shadow: 0 4px 15px rgba(0,0,0,0.3), 0 0 20px rgba(102, 126, 234, 0.5); }
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+    .chat-container .card {
+        display: none;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+    }
+    .chat-container .card.show {
+        display: block;
+    }
+    .chat-box {
+        max-height: 180px;
+        overflow-y: auto;
+        font-size: 13px;
+    }
+    .chat-message {
+        padding: 6px 10px;
+        margin: 4px 0;
+        border-radius: 10px;
+        max-width: 85%;
+        word-wrap: break-word;
+    }
+    .chat-user {
+        background-color: #3498db;
+        color: white;
+        margin-left: auto;
+    }
+    .chat-bot {
+        background-color: #ecf0f1;
+        color: #333;
+        font-size: 12px;
+    }
+    .chat-container .btn-sm {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+    .chat-container hr {
+        margin: 6px 0;
+    }
+    .chat-container small {
+        font-size: 9px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h2>
+        </div>
+        <div class="col-auto">
+            <a href="/logout" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card bg-primary text-white">
+                <div class="card-body">
+                    <h3>{{ total_students }}</h3>
+                    <p class="mb-0"><i class="fas fa-users"></i> Total Students</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-success text-white">
+                <div class="card-body">
+                    <h3>{{ total_subjects }}</h3>
+                    <p class="mb-0"><i class="fas fa-book"></i> Total Subjects</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-warning text-white">
+                <div class="card-body">
+                    <h3>{{ total_exams }}</h3>
+                    <p class="mb-0"><i class="fas fa-calendar"></i> Total Exams</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-info text-white">
+                <div class="card-body">
+                    <h3>{{ total_hall_tickets }}</h3>
+                    <p class="mb-0"><i class="fas fa-ticket-alt"></i> Hall Tickets</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-users"></i> Students</h5>
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+                        <i class="fas fa-plus"></i> Add Student
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Register No</th>
+                                    <th>Email</th>
+                                    <th>Department</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                <tr>
+                                    <td>{{ student.name }}</td>
+                                    <td>{{ student.register_number }}</td>
+                                    <td>{{ student.email }}</td>
+                                    <td>{{ student.department }}</td>
+                                    <td>
+                                        <a href="/admin/generate-ticket/{{ student.id }}" class="btn btn-sm btn-info" title="Generate Ticket">
+                                            <i class="fas fa-qrcode"></i>
+                                        </a>
+                                        <a href="/admin/edit-student/{{ student.id }}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="/admin/delete-student/{{ student.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-book"></i> Subjects</h5>
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
+                        <i class="fas fa-plus"></i> Add Subject
+                    </button>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Subject Name</th>
+                                <th>Subject Code</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subject in subjects %}
+                            <tr>
+                                <td>{{ subject.subject_name }}</td>
+                                <td>{{ subject.subject_code }}</td>
+                                <td>
+                                    <a href="/admin/edit-subject/{{ subject.id }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="/admin/delete-subject/{{ subject.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-calendar"></i> Exams</h5>
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addExamModal">
+                        <i class="fas fa-plus"></i> Add Exam
+                    </button>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Date</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Hall</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for exam in exams %}
+                                <tr>
+                                    <td>{{ exam.subject.subject_name }}</td>
+                                    <td>{{ exam.date }}</td>
+                                    <td>{{ exam.time }}</td>
+                                    <td>{{ exam.end_time or 'N/A' }}</td>
+                                    <td>{{ exam.hall_no }}</td>
+                                <td>
+                                    <a href="/admin/edit-exam/{{ exam.id }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="/admin/delete-exam/{{ exam.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-ticket-alt"></i> Hall Ticket Actions</h5>
+                </div>
+                <div class="card-body">
+                    <a href="/admin/generate-all-tickets" class="btn btn-primary">
+                        <i class="fas fa-qrcode"></i> Generate All Tickets
+                    </a>
+                    <a href="/admin/view-tickets" class="btn btn-success">
+                        <i class="fas fa-eye"></i> View All Tickets
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Student Modal -->
+<div class="modal fade" id="addStudentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="/admin/add-student">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Student</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Register Number</label>
+                        <input type="text" class="form-control" name="register_number" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Department</label>
+                        <select class="form-select" name="department" required>
+                            <option value="CSE">CSE</option>
+                            <option value="ECE">ECE</option>
+                            <option value="EEE">EEE</option>
+                            <option value="MECH">MECH</option>
+                            <option value="CIVIL">CIVIL</option>
+                            <option value="IT">IT</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Subject Modal -->
+<div class="modal fade" id="addSubjectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="/admin/add-subject">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Subject</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Subject Name</label>
+                        <input type="text" class="form-control" name="subject_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Subject Code</label>
+                        <input type="text" class="form-control" name="subject_code" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Subject</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Exam Modal -->
+<div class="modal fade" id="addExamModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="/admin/add-exam">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Exam</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Subject</label>
+                        <select class="form-select" name="subject_id" required>
+                            {% for subject in subjects %}
+                            <option value="{{ subject.id }}">{{ subject.subject_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Exam Name</label>
+                        <input type="text" class="form-control" name="exam_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-control" name="date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Time</label>
+                        <input type="text" class="form-control" name="time" placeholder="09:00 AM" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">End Time</label>
+                        <input type="text" class="form-control" name="end_time" placeholder="10:30 AM">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Hall Number</label>
+                        <input type="text" class="form-control" name="hall_no" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Exam</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- AI Chatbot -->
+<div class="chat-container">
+    <div class="chat-btn-wrapper">
+        <span class="chat-tooltip">AI Assistant</span>
+        <button class="chat-toggle-btn" onclick="toggleChat()" title="Click for Quick Actions">
+            <i class="fas fa-robot"></i>
+        </button>
+    </div>
+    <div class="card" id="chatCard">
+        <div class="card-header bg-gradient text-white d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <h6 class="mb-0"><i class="fas fa-robot"></i> AI Assistant</h6>
+            <button class="btn btn-sm btn-light" onclick="toggleChat()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="card-body chat-box" id="chatBox">
+            <div class="chat-message chat-bot">Hello! I'm your AI Assistant. Click a button below:</div>
+        </div>
+        <div class="card-footer">
+            <!-- Quick Action Buttons -->
+            <div class="mb-2">
+                <small class="text-muted fw-bold">STUDENTS:</small><br>
+                <button class="btn btn-sm btn-success me-1 mb-1" onclick="showAddStudent()">+ Add</button>
+                <button class="btn btn-sm btn-info me-1 mb-1" onclick="showAllStudents()">View</button>
+                <button class="btn btn-sm btn-warning me-1 mb-1" onclick="showTotalStudents()">Count</button>
+            </div>
+            <div class="mb-2">
+                <small class="text-muted fw-bold">SUBJECTS:</small><br>
+                <button class="btn btn-sm btn-success me-1 mb-1" onclick="showAddSubject()">+ Add</button>
+                <button class="btn btn-sm btn-info me-1 mb-1" onclick="showAllSubjects()">View</button>
+            </div>
+            <div class="mb-2">
+                <small class="text-muted fw-bold">TICKETS:</small><br>
+                <button class="btn btn-sm btn-primary me-1 mb-1" onclick="generateAllTickets()">Generate All</button>
+            </div>
+            <hr>
+            <!-- Delete Operations -->
+            <div>
+                <small class="text-muted fw-bold">DELETE:</small><br>
+                <button class="btn btn-sm btn-danger me-1 mb-1" onclick="promptDelete('student')">Student</button>
+                <button class="btn btn-sm btn-danger me-1 mb-1" onclick="promptDelete('subject')">Subject</button>
+                <button class="btn btn-sm btn-danger me-1 mb-1" onclick="promptDelete('exam')">Exam</button>
+            </div>
+            <hr>
+            <div>
+                <small class="text-muted fw-bold">RESET:</small><br>
+                <button class="btn btn-sm btn-warning me-1 mb-1" onclick="promptResetPassword()">Reset Password</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleChat() {
+    const chatCard = document.getElementById('chatCard');
+    chatCard.classList.toggle('show');
+    console.log('Chat toggled, class show:', chatCard.classList.contains('show'));
+}
+
+function addMessage(message, isUser = false) {
+    const chatBox = document.getElementById('chatBox');
+    chatBox.innerHTML += `<div class="chat-message ${isUser ? 'chat-user' : 'chat-bot'}">${message}</div>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function showAddStudent() {
+    addMessage('Adding Student...', true);
+    const name = prompt('Enter student name:');
+    if (!name) { addMessage('Cancelled'); return; }
+    const email = prompt('Enter email:');
+    if (!email) { addMessage('Cancelled'); return; }
+    const regNo = prompt('Enter register number:');
+    if (!regNo) { addMessage('Cancelled'); return; }
+    const dept = prompt('Enter department (CSE/ECE/EEE/MECH/CIVIL/IT):');
+    if (!dept) { addMessage('Cancelled'); return; }
+    sendCommand('add student ' + name + ' ' + email + ' ' + regNo + ' ' + dept);
+}
+
+function showAllStudents() {
+    addMessage('Showing all students...', true);
+    sendCommand('show all students');
+}
+
+function showTotalStudents() {
+    addMessage('Getting student count...', true);
+    sendCommand('total students');
+}
+
+function showAddSubject() {
+    addMessage('Adding Subject...', true);
+    const name = prompt('Enter subject name:');
+    if (!name) { addMessage('Cancelled'); return; }
+    sendCommand('create subject ' + name);
+}
+
+function showAllSubjects() {
+    addMessage('Showing all subjects...', true);
+    sendCommand('show all subjects');
+}
+
+function generateAllTickets() {
+    addMessage('Generating all tickets...', true);
+    sendCommand('generate all tickets');
+}
+
+function promptDelete(type) {
+    addMessage('Delete ' + type + '...', true);
+    let promptText = '';
+    if (type === 'student') {
+        promptText = 'Enter student name or register number:';
+    } else if (type === 'subject') {
+        promptText = 'Enter subject name or subject code (e.g., DBMS or SUB001):';
+    } else if (type === 'exam') {
+        promptText = 'Enter exam name to delete:';
+    }
+    const value = prompt(promptText);
+    if (!value) { addMessage('Cancelled'); return; }
+    sendCommand('delete ' + type + ' ' + value);
+}
+
+function promptResetPassword() {
+    addMessage('Resetting password...', true);
+    const email = prompt('Enter student email:');
+    if (!email) { addMessage('Cancelled'); return; }
+    const newPwd = prompt('Enter new password:');
+    if (!newPwd) { addMessage('Cancelled'); return; }
+    sendCommand('reset password ' + email + ' ' + newPwd);
+}
+
+function sendCommand(message) {
+    fetch('/chatbot', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: message})
+    })
+    .then(res => res.json())
+    .then(data => {
+        addMessage(data.response, false);
+        if (message.startsWith('add student') || message.startsWith('create subject') || 
+            message.startsWith('delete student') || message.startsWith('delete subject') ||
+            message.startsWith('delete exam') || message.startsWith('generate all')) {
+            setTimeout(() => location.reload(), 1500);
+        }
+    })
+    .catch(error => {
+        addMessage('Error: ' + error.message + '. Please login as admin and try again.', false);
+    });
+}
+</script>
+{% endblock %}

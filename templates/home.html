@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Smart Hall Ticket System{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <h1 class="display-3 mb-4">Smart Hall Ticket Management System</h1>
+        <p class="lead mb-4">QR Code Verification & AI Admin Assistant</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="/login" class="btn btn-light btn-lg">Student Login</a>
+            <a href="/admin/login" class="btn btn-outline-light btn-lg">Admin Login</a>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-qrcode fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">QR Code Generation</h5>
+                    <p class="card-text">Generate unique QR codes for each student with secure tokens embedded.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-file-pdf fa-3x text-danger mb-3"></i>
+                    <h5 class="card-title">PDF Hall Tickets</h5>
+                    <p class="card-text">Download professional PDF hall tickets with embedded QR codes.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-qrcode fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">QR Scanner</h5>
+                    <p class="card-text">Verify students using mobile camera QR scanning.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-robot fa-3x text-info mb-3"></i>
+                    <h5 class="card-title">AI Chatbot</h5>
+                    <p class="card-text">NLP-powered admin assistant for quick database operations.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-shield fa-3x text-warning mb-3"></i>
+                    <h5 class="card-title">Secure Authentication</h5>
+                    <p class="card-text">BCrypt password hashing and session-based security.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-3x text-secondary mb-3"></i>
+                    <h5 class="card-title">Analytics Dashboard</h5>
+                    <p class="card-text">Real-time statistics and management dashboard.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-6 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-info-circle"></i> How It Works</h4>
+                </div>
+                <div class="card-body">
+                    <ol>
+                        <li class="mb-2"><strong>Admin Login:</strong> Admin manages students, subjects, and exams</li>
+                        <li class="mb-2"><strong>Generate Tickets:</strong> Admin generates hall tickets with unique QR tokens</li>
+                        <li class="mb-2"><strong>Student Access:</strong> Students login to view and download their hall tickets</li>
+                        <li class="mb-2"><strong>QR Verification:</strong> QR scanner validates students at exam halls</li>
+                        <li class="mb-0"><strong>Download:</strong> Scan QR to automatically download PDF ticket</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

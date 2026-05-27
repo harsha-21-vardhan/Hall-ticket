@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard - Smart Hall Ticket System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-user-circle"></i> Welcome, {{ current_user.name }}</h2>
+        </div>
+        <div class="col-auto">
+            <a href="/logout" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user"></i> Personal Details</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Name:</strong> {{ current_user.name }}</p>
+                    <p><strong>Register No:</strong> {{ current_user.register_number }}</p>
+                    <p><strong>Email:</strong> {{ current_user.email }}</p>
+                    <p><strong>Department:</strong> {{ current_user.department }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-ticket-alt"></i> Hall Ticket</h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if hall_ticket %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle"></i> Hall Ticket Generated
+                        </div>
+                        <a href="/student/qr-code" class="btn btn-primary">
+                            <i class="fas fa-qrcode"></i> View QR Code
+                        </a>
+                        <a href="/student/download-pdf" class="btn btn-success">
+                            <i class="fas fa-download"></i> Download PDF
+                        </a>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-circle"></i> Hall ticket not generated yet. Contact admin.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-calendar"></i> Quick Links</h5>
+                </div>
+                <div class="card-body">
+                    <a href="/student/qr-code" class="btn btn-outline-primary w-100 mb-2">
+                        <i class="fas fa-qrcode"></i> View QR Code
+                    </a>
+                    {% if hall_ticket %}
+                    <a href="/download/{{ hall_ticket.qr_token }}" class="btn btn-outline-success w-100 mb-2">
+                        <i class="fas fa-file-pdf"></i> Download Ticket
+                    </a>
+                    {% endif %}
+                    <a href="/scanner" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-qrcode"></i> Test Scanner
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="fas fa-calendar"></i> Exam Schedule</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Exam Name</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Hall No</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for exam in exams %}
+                                <tr>
+                                    <td>{{ exam.subject.subject_name }}</td>
+                                    <td>{{ exam.exam_name }}</td>
+                                    <td>{{ exam.date }}</td>
+                                    <td>{{ exam.time }}</td>
+                                    <td>{{ exam.hall_no }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

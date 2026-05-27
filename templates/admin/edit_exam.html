@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Exam - Smart Hall Ticket System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h4 class="mb-0"><i class="fas fa-edit"></i> Edit Exam</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Subject</label>
+                            <select class="form-select" name="subject_id" required>
+                                {% for s in subjects %}
+                                <option value="{{ s.id }}" {% if s.id == exam.subject_id %}selected{% endif %}>{{ s.subject_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Exam Name</label>
+                            <input type="text" class="form-control" name="exam_name" value="{{ exam.exam_name }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-control" name="date" value="{{ exam.date }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Time</label>
+                            <input type="text" class="form-control" name="time" value="{{ exam.time }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">End Time</label>
+                            <input type="text" class="form-control" name="end_time" value="{{ exam.end_time or '' }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Hall Number</label>
+                            <input type="text" class="form-control" name="hall_no" value="{{ exam.hall_no }}" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-warning">Update Exam</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}View Hall Tickets - Smart Hall Ticket System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="fas fa-ticket-alt"></i> All Hall Tickets</h2>
+        </div>
+        <div class="col-auto">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Register No</th>
+                            <th>Department</th>
+                            <th>QR Token</th>
+                            <th>Generated At</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr>
+                            <td>{{ ticket.student.name }}</td>
+                            <td>{{ ticket.student.register_number }}</td>
+                            <td>{{ ticket.student.department }}</td>
+                            <td><small>{{ ticket.qr_token }}</small></td>
+                            <td>{{ ticket.generated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                {% if ticket.is_used %}
+                                <span class="badge bg-danger">Used</span>
+                                {% else %}
+                                <span class="badge bg-success">Active</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/download/{{ ticket.qr_token }}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

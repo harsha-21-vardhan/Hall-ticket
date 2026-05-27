@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}QR Scanner - Smart Hall Ticket System{% endblock %}
+
+{% block extra_css %}
+<style>
+    #reader {
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    #reader video {
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-success text-white text-center">
+                    <h4 class="mb-0"><i class="fas fa-qrcode"></i> QR Code Scanner</h4>
+                </div>
+                <div class="card-body text-center">
+                    <p class="mb-3">Allow camera access to scan QR codes for student verification</p>
+                    <div id="reader"></div>
+                    <div class="mt-3">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="manualToken" placeholder="Or enter token manually">
+                            <button class="btn btn-primary" onclick="verifyManual()">
+                                Verify
+                            </button>
+                        </div>
+                    </div>
+                    <div id="result" class="mt-3"></div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> How to Use</h5>
+                </div>
+                <div class="card-body">
+                    <ol>
+                        <li>Allow camera access when prompted</li>
+                        <li>Point the camera at the student's QR code</li>
+                        <li>The QR code will be automatically scanned</li>
+                        <li>You will be redirected to the verification page</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script>
+function onScanSuccess(decodedText, decodedResult) {
+    window.location.href = decodedText.replace('http://localhost:5000', '');
+}
+
+function onScanFailure(error) {
+    console.warn(`Code scan error = ${error}`);
+}
+
+let html5QrcodeScanner = new Html5QrcodeScanner(
+    "reader",
+    { fps: 10, qrbox: { width: 250, height: 250 } },
+    false
+);
+html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+
+function verifyManual() {
+    const token = document.getElementById('manualToken').value.trim();
+    if (token) {
+        window.location.href = '/verify/' + token;
+    }
+}
+</script>
+{% endblock %}

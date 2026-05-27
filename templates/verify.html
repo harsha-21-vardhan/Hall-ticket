@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Verification Result - Smart Hall Ticket System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            {% if valid %}
+            <div class="card border-success">
+                <div class="card-header bg-success text-white text-center">
+                    <h3 class="mb-0"><i class="fas fa-check-circle"></i> VALID</h3>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-check fa-4x text-success"></i>
+                    </div>
+                    
+                    <div class="alert alert-success text-center">
+                        <h4>This hall ticket is VALID</h4>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Student Details</h5>
+                            <hr>
+                            <p><strong>Name:</strong> {{ student.name }}</p>
+                            <p><strong>Register Number:</strong> {{ student.register_number }}</p>
+                            <p><strong>Department:</strong> {{ student.department }}</p>
+                            <p><strong>Email:</strong> {{ student.email }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Exam Schedule</h5>
+                            <hr>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>Date</th>
+                                            <th>Time</th>
+                                            <th>Hall</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for exam in exams %}
+                                        <tr>
+                                            <td>{{ exam.subject.subject_name }}</td>
+                                            <td>{{ exam.date }}</td>
+                                            <td>{{ exam.time }}</td>
+                                            <td>{{ exam.hall_no }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="/scanner" class="btn btn-primary">Scan Another</a>
+                    <a href="/" class="btn btn-secondary">Home</a>
+                </div>
+            </div>
+            {% else %}
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white text-center">
+                    <h3 class="mb-0"><i class="fas fa-times-circle"></i> INVALID</h3>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-user-times fa-4x text-danger mb-4"></i>
+                    <div class="alert alert-danger">
+                        <h4>This hall ticket is INVALID or NOT FOUND</h4>
+                    </div>
+                    <p>The scanned QR code does not match any student in the database.</p>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="/scanner" class="btn btn-primary">Scan Another</a>
+                    <a href="/" class="btn btn-secondary">Home</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
