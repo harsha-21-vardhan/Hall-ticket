@@ -52,7 +52,10 @@ class Student(db.Model, UserMixin):
     register_number = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     department = db.Column(db.String(50), nullable=False)
-    hall_tickets = db.relationship('HallTicket', backref='student', lazy=True)
+    hall_tickets = db.relationship(
+        'HallTicket', backref='student', lazy=True,
+        cascade='all, delete-orphan'
+    )
 
 class Subject(db.Model):
     __tablename__ = 'subjects'
@@ -405,9 +408,13 @@ def delete_student(id):
         return redirect(url_for('home'))
     
     student = Student.query.get_or_404(id)
-    db.session.delete(student)
-    db.session.commit()
-    flash('Student deleted successfully', 'success')
+    try:
+        db.session.delete(student)
+        db.session.commit()
+        flash('Student deleted successfully', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('Unable to delete student. Remove their hall ticket first or try again.', 'danger')
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/add-subject', methods=['POST'])
