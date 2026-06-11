@@ -121,10 +121,12 @@ def generate_pdf(student, hall_ticket, qr_filename):
     c.drawCentredString(width / 2, height - 80, "HALL TICKET")
     
     c.setFont("Helvetica-Bold", 16)
-    c.drawCentredString(width / 2, height - 120, "Smart Examination System")
+    c.drawCentredString(width / 2, height - 115, "JSS College of Arts Commerce and Science")
+    c.setFont("Helvetica", 12)
+    c.drawCentredString(width / 2, height - 135, "Ooty Road, Mysore")
     
     c.setLineWidth(1)
-    c.line(50, height - 140, width - 50, height - 140)
+    c.line(50, height - 155, width - 50, height - 155)
     
     c.setFont("Helvetica-Bold", 12)
     c.drawString(50, height - 180, "Student Name:")
@@ -179,13 +181,15 @@ def generate_pdf(student, hall_ticket, qr_filename):
         c.drawImage(qr_path, width - 180, 50, 130, 130)
     
     c.setFont("Helvetica-Bold", 10)
-    c.drawString(50, 50, f"Token: {hall_ticket.qr_token}")
+    c.drawString(50, 60, f"Token: {hall_ticket.qr_token}")
     c.setFont("Helvetica", 8)
-    c.drawString(50, 35, "Scan QR code to download hall ticket")
+    c.drawString(50, 45, "Scan QR code to download hall ticket")
     
     c.setFont("Helvetica-Bold", 10)
-    c.drawString(50, 80, "Authorized Signature")
-    c.line(50, 70, 200, 70)
+    c.drawString(width - 250, 100, "Principal Signature")
+    c.line(width - 250, 90, width - 100, 90)
+    c.setFont("Helvetica-Oblique", 10)
+    c.drawString(width - 245, 75, "Generated")
     
     c.save()
     buffer.seek(0)
